@@ -6,19 +6,13 @@ from flask import Flask
 import threading
 from utils import check_ban
 
-app = Flask(__name__)
-
+# 🔒 Carrega as variáveis de ambiente
 load_dotenv()
 APPLICATION_ID = os.getenv("APPLICATION_ID")
 TOKEN = os.getenv("TOKEN")
 
-intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents)
-
-DEFAULT_LANG = "pt"
-user_languages = {}
-
+# ⚙️ Inicializa Flask para impedir sleep no Render
+app = Flask(__name__)
 nomBot = "Nenhum"
 
 @app.route('/')
@@ -27,22 +21,33 @@ def home():
     return f"Bot {nomBot} está em funcionamento"
 
 def run_flask():
-    app.run(host='0.0.0.0', port=10000)
+    app.run(host='0.0.0.0', port=3000)  # Porta padrão do Render
 
 threading.Thread(target=run_flask).start()
 
+# 🔧 Configura o bot
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+DEFAULT_LANG = "pt"
+user_languages = {}
+
+# ✅ Evento ao iniciar o bot
 @bot.event
 async def on_ready():
     global nomBot
     nomBot = f"{bot.user}"
-    print(f"O bot foi conectado como {bot.user}")
+    print(f"✅ Bot conectado como {bot.user}")
 
+# 🧾 Comando: listar servidores
 @bot.command(name="guilds")
 async def show_guilds(ctx):
     guild_names = [f"{i+1}. {guild.name}" for i, guild in enumerate(bot.guilds)]
     guild_list = "\n".join(guild_names)
     await ctx.send(f"O bot está nas seguintes guilds:\n{guild_list}")
 
+# 🌐 Comando: mudar idioma
 @bot.command(name="lang")
 async def change_language(ctx, lang_code: str):
     lang_code = lang_code.lower()
@@ -59,6 +64,7 @@ async def change_language(ctx, lang_code: str):
 
     await ctx.send(f"{ctx.author.mention} {message}")
 
+# 🔍 Comando: verificar ID
 @bot.command(name="ID")
 async def check_ban_command(ctx):
     content = ctx.message.content
@@ -98,18 +104,18 @@ async def check_ban_command(ctx):
         region = ban_status.get("region", "N/D")
         id_str = f"`{user_id}`"
 
-        if isinstance(period, int):
-            period_str = {
+        period_str = {
+            True: {
                 "pt": f"mais de {period} meses",
                 "en": f"more than {period} months",
                 "fr": f"plus de {period} mois"
-            }[lang]
-        else:
-            period_str = {
+            }.get(lang, "indisponível"),
+            False: {
                 "pt": "indisponível",
                 "en": "unavailable",
                 "fr": "indisponible"
             }[lang]
+        }[isinstance(period, int)]
 
         embed = discord.Embed(
             color=0xFF0000 if is_banned else 0x00FF00,
@@ -117,12 +123,11 @@ async def check_ban_command(ctx):
         )
 
         if is_banned:
-            titles = {
+            embed.title = {
                 "pt": "**▌ Conta Banida 🛑 **",
                 "en": "**▌ Banned Account 🛑 **",
                 "fr": "**▌ Compte banni 🛑 **"
-            }
-            embed.title = titles[lang]
+            }[lang]
             embed.description = (
                 f"**• {'Motivo' if lang == 'pt' else 'Reason' if lang == 'en' else 'Raison'} :** "
                 f"{'Esta conta foi banida por usar cheats.' if lang == 'pt' else 'This account was confirmed for using cheats.' if lang == 'en' else 'Ce compte a été confirmé comme utilisant des hacks.'}\n"
@@ -134,12 +139,11 @@ async def check_ban_command(ctx):
             file = discord.File("assets/banned.gif", filename="banned.gif")
             embed.set_image(url="attachment://banned.gif")
         else:
-            titles = {
+            embed.title = {
                 "pt": "**▌ Conta Limpa ✅ **",
                 "en": "**▌ Clean Account ✅ **",
                 "fr": "**▌ Compte non banni ✅ **"
-            }
-            embed.title = titles[lang]
+            }[lang]
             embed.description = (
                 f"**• {'Estado' if lang == 'pt' else 'Status'} :** "
                 f"{'Sem provas suficientes de uso de cheats.' if lang == 'pt' else 'No sufficient evidence of cheat usage on this account.' if lang == 'en' else 'Aucune preuve suffisante pour confirmer l’utilisation de hacks sur ce compte.'}\n"
@@ -154,4 +158,5 @@ async def check_ban_command(ctx):
         embed.set_footer(text="Desenvolvido pela ZeroTrace")
         await ctx.send(f"{ctx.author.mention}", embed=embed, file=file)
 
+# 🚀 Inicia o bot
 bot.run(TOKEN)

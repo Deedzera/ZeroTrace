@@ -125,7 +125,7 @@ async def check_ban_command(ctx):
             embed.title = titles[lang]
             embed.description = (
                 f"**• {'Motivo' if lang == 'pt' else 'Reason' if lang == 'en' else 'Raison'} :** "
-                f"{'Esta conta foi confirmada como utilizando batotas.' if lang == 'pt' else 'This account was confirmed for using cheats.' if lang == 'en' else 'Ce compte a été confirmé comme utilisant des hacks.'}\n"
+                f"{'Esta conta foi banida por usar cheats.' if lang == 'pt' else 'This account was confirmed for using cheats.' if lang == 'en' else 'Ce compte a été confirmé comme utilisant des hacks.'}\n"
                 f"**• {'Duração da suspensão' if lang == 'pt' else 'Suspension duration' if lang == 'en' else 'Durée de la suspension'} :** {period_str}\n"
                 f"**• {'Apelido' if lang == 'pt' else 'Nickname' if lang == 'en' else 'Pseudo'} :** `{nickname}`\n"
                 f"**• {'ID do jogador' if lang == 'pt' else 'Player ID' if lang == 'en' else 'ID du joueur'} :** {id_str}\n"
@@ -142,7 +142,7 @@ async def check_ban_command(ctx):
             embed.title = titles[lang]
             embed.description = (
                 f"**• {'Estado' if lang == 'pt' else 'Status'} :** "
-                f"{'Sem provas suficientes de uso de batotas nesta conta.' if lang == 'pt' else 'No sufficient evidence of cheat usage on this account.' if lang == 'en' else 'Aucune preuve suffisante pour confirmer l’utilisation de hacks sur ce compte.'}\n"
+                f"{'Sem provas suficientes de uso de cheats.' if lang == 'pt' else 'No sufficient evidence of cheat usage on this account.' if lang == 'en' else 'Aucune preuve suffisante pour confirmer l’utilisation de hacks sur ce compte.'}\n"
                 f"**• {'Apelido' if lang == 'pt' else 'Nickname' if lang == 'en' else 'Pseudo'} :** `{nickname}`\n"
                 f"**• {'ID do jogador' if lang == 'pt' else 'Player ID' if lang == 'en' else 'ID du joueur'} :** {id_str}\n"
                 f"**• {'Região' if lang == 'pt' else 'Region' if lang == 'en' else 'Région'} :** `{region}`"
